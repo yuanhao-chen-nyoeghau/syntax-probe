@@ -1,0 +1,35 @@
+# N1 — per-layer robustness causality, Mistral-7B-v0.3.
+#
+# Patches at L7, the model's β-peak observational layer for the cc
+# reflexive 3-way interaction (averaged across the four modifier types;
+# see docs/activation_patching_plan.md §3.3). Bidirectional protocol:
+# match→swap and swap→match both run.
+#
+# Auto-resolves to the latest probe-training run named "mistral_7b_v03_ud_ewt".
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: mistralai/Mistral-7B-v0.3
+  torch_dtype: bfloat16
+  batch_size: 128
+  max_length: 80
+  subword_pooling: mean
+
+experiment:
+  kind: activation_patching
+  name: cc_n1_mistral_7b_v03
+  probe_run_name: mistral_7b_v03_ud_ewt
+  stimuli_kind: c_command
+  stimuli_config:
+    kind: c_command_stimuli
+    name: default
+    num_items: 1000
+  variant_config:
+    variant: n1
+    intervention_layer: 7
+    bidirectional: true

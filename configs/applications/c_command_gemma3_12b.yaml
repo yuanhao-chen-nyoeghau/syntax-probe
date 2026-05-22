@@ -1,0 +1,26 @@
+# Apply trained probes to c-command stimuli using Gemma-3-12B.
+# Auto-resolves to the latest probe-training run named "gemma3_12b_ud_ewt".
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: google/gemma-3-12b-pt
+  torch_dtype: bfloat16
+  batch_size: 384
+  max_length: 80
+  subword_pooling: mean
+
+experiment:
+  kind: apply_probes
+  name: c_command_gemma3_12b
+  probe_run_name: gemma3_12b_ud_ewt
+  stimuli_kind: c_command
+  stimuli_config:
+    kind: c_command_stimuli
+    name: default
+    num_items: 1000
+  activation_cache_name: c_command_stimuli

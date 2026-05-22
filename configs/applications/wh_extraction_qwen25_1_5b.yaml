@@ -1,0 +1,32 @@
+# Apply trained probes to wh-extraction stimuli, producing per-condition
+# layer profiles. By default, this auto-resolves to the most recent
+# probe-training run with name "qwen25_1_5b_ud_ewt"; override at the CLI
+# with `--set experiment.probe_run_dir=results/probe_training/<specific-id>`
+# if you want to apply a particular run.
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: Qwen/Qwen2.5-1.5B
+  torch_dtype: bfloat16
+  batch_size: 768
+  max_length: 64
+  subword_pooling: mean  # must match the trained probe bank's pooling
+
+experiment:
+  kind: apply_probes
+  name: wh_extraction_qwen25_1_5b
+  # Auto-resolve to the latest probe-training run with this name. The runner
+  # picks the most-recently-modified non-empty matching directory under
+  # runtime.output_dir/probe_training/.
+  probe_run_name: qwen25_1_5b_ud_ewt
+  stimuli_kind: wh_extraction
+  stimuli_config:
+    kind: wh_extraction_stimuli
+    name: default
+    num_items: 1000
+  activation_cache_name: wh_extraction_stimuli

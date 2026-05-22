@@ -1,0 +1,35 @@
+# Verify the methodological precondition that minimal triples in the
+# wh-extraction stimuli have (approximately) constant gold dependency-tree
+# distance for the experimental word pairs.
+#
+# Run after generating stimuli; before training probes. If any item shows a
+# distance spread > max_distance_difference, inspect the report and decide
+# whether to redesign the stimuli or note the confound.
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+# Model section is unused by this experiment but required by the schema.
+model:
+  model_name: meta-llama/Llama-3.2-1B
+
+experiment:
+  kind: verify_stimuli
+  name: verify_wh_extraction_spacy
+  target_experiment: wh_extraction
+  parser: spacy
+  # Transformer-based pipeline (roberta-base). LAS ~94 / UAS ~95 on UD-EWT,
+  # ~5 LAS points above en_core_web_lg. Worth the ~430MB download. Run
+  #   `python -m spacy download en_core_web_trf`
+  # once before invoking this config.
+  # GPU is recommended for trf; set --set experiment.gpu_id=0 (or whatever
+  # device id) on the CLI. Falls back to CPU silently if gpu_id is unset.
+  spacy_model: en_core_web_trf
+  max_distance_difference: 1
+  # Number of items to generate from the combinatorial lexicon (default 1000
+  # = 3,000 stimuli). The full combinatorial pool has ~103K valid items, so
+  # 1000 provides broad lexical coverage while keeping verification tractable.
+  num_items: 1000

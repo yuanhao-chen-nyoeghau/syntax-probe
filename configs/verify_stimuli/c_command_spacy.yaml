@@ -1,0 +1,49 @@
+# Verify dependency-tree distance properties of c-command stimuli.
+#
+# The verifier groups records by *structural-equivalence class* — see
+# verify_stimuli._group_key_for_record. For c_command:
+#   * reflexive   : groups of 4 records per (item_id, modifier_type). All
+#                   records share the same UD parse template and only vary
+#                   gender/anaphor surface form. Within-group spread should
+#                   be ~0 if the parser is consistent.
+#   * principle_c : groups of 1 record per (item_id, condition). The two
+#                   conditions (violation, obviated) have different
+#                   structures, so we record per-condition UD distances for
+#                   documentation but do not enforce spread.
+#   * bound_var   : same as principle_c (groups of 1).
+#
+# Failures (within-template spread > max_distance_difference) for the
+# reflexive sub-experiment indicate parser instability on the affected
+# (item_id, modifier_type). With en_core_web_trf this should be ~0%; with
+# en_core_web_lg it is concentrated on rcobj (~5%) due to spaCy's CNN
+# parser flipping its analysis under gender mismatch in object relatives.
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+# Model section is unused by this experiment but required by the schema.
+model:
+  model_name: meta-llama/Llama-3.2-1B
+
+experiment:
+  kind: verify_stimuli
+  name: verify_c_command_spacy
+  target_experiment: c_command
+  parser: spacy
+  # Transformer-based pipeline (roberta-base). LAS ~94 / UAS ~95 on UD-EWT,
+  # ~5 LAS points above en_core_web_lg. Worth the ~430MB download. Run
+  #   `python -m spacy download en_core_web_trf`
+  # once before invoking this config.
+  # GPU is recommended for trf; set --set experiment.gpu_id=0 (or whatever
+  # device id) on the CLI. Falls back to CPU silently if gpu_id is unset.
+  spacy_model: en_core_web_trf
+  # Keep this at 1: within a (item_id, modifier_type) group, all 4 records
+  # share the same UD parse template; spread should be 0 (or rarely 1 from
+  # parser noise). Cross-group differences (different modifier types,
+  # different conditions in principle_c/bound_var) are by design and not
+  # enforced — see _group_key_for_record.
+  max_distance_difference: 1
+  num_items: 1000

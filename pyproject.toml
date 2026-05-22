@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "syntax_probe"
+version = "0.2.0"
+description = "Probing LLMs for formal syntactic structure via dependency-trained structural probes."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "CC-BY-NC-SA-4.0"
+authors = [{ name = "Yuanhao Chen", email = "yc.th@dartmouth.edu" }]
+
+dependencies = [
+    "torch>=2.3",
+    "transformers>=4.45",
+    "tokenizers>=0.20",
+    "accelerate>=1.0",
+    "safetensors>=0.4",
+    "sentencepiece>=0.2",
+    "numpy>=2.0",
+    "scipy>=1.13",
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+    "conllu>=4.5",
+    "tqdm>=4.66",
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.2", "pytest-cov>=5.0", "ruff>=0.6", "mypy>=1.10"]
+analysis = [
+    "pandas>=2.2",
+    "matplotlib>=3.9",
+    "seaborn>=0.13",
+    "jupyter>=1.0",
+    "statsmodels>=0.14",
+]
+
+[project.scripts]
+syntax-probe = "syntax_probe.cli:main"
+wh-stats = "analyses.wh_extraction_stats:main"
+cc-stats = "analyses.c_command_stats:main"
+patching-stats = "analyses.patching_stats:main"
+patching-cross-model = "analyses.patching_cross_model:main"
+run-all-stats = "analyses.run_all_stats:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["syntax_probe", "analyses"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM", "RET"]
+ignore = [
+    "E501",   # line length handled by formatter
+    "B905",   # zip() without strict= — too pedantic for data analysis loops
+    "SIM108", # ternary vs if/else — readability preference
+    "RET505", # unnecessary elif after return — elif is clearer for parallel branches
+]
+
+[tool.ruff.lint.per-file-ignores]
+"analyses/**" = [
+    "E741", # ambiguous variable name l — l for "layer" in notebook/script loops is clear
+    "I001", # import sorting — relaxed for analysis scripts and notebooks
+]
+"tests/**" = [
+    "S101", # use of assert — expected in tests
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["syntax_probe", "analyses"]
+
+[tool.ruff.lint.pep8-naming]
+# Layer indices follow the methodology doc's ``L_patch`` / ``L_measure``
+# notation throughout docstrings and comments; allow the uppercase form
+# in code too rather than rename away from the domain term.
+extend-ignore-names = ["L", "L_patch", "L_measure"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

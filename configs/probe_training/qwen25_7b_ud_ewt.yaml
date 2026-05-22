@@ -1,0 +1,38 @@
+# Train Hewitt & Manning structural probes per layer on UD English EWT,
+# using Qwen2.5-7B as the backbone. Same architecture family as Qwen2.5-1.5B
+# but ~5x the parameters; lets us check whether the wh-extraction effect
+# scales within an architecture.
+#
+# Sizing: 28 transformer layers (vs 28 for 1.5B), hidden_size 3584
+# (vs 1536), so probe input dim is 3584 here. Probe rank stays at 64
+# to keep capacity comparable across model sizes.
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: Qwen/Qwen2.5-7B
+  torch_dtype: bfloat16
+  batch_size: 128
+  max_length: 256
+  subword_pooling: mean
+
+experiment:
+  kind: probe_training
+  name: qwen25_7b_ud_ewt
+  corpus_path: data/ud_ewt/ud_ewt_master.jsonl
+  activation_cache_name: ud_ewt
+  layers: null
+
+  probe:
+    rank: 64
+    learning_rate: 1.0e-3
+    epochs: 100
+    batch_size: 256
+    input_normalization: per_corpus_standardize
+    lr_decay_factor: 0.1
+    lr_decay_patience: 1
+    lr_decay_max_resets: 4

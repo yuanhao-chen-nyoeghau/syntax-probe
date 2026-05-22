@@ -1,0 +1,45 @@
+# Train Hewitt & Manning structural probes per layer on UD English EWT,
+# using Qwen2.5-1.5B as the backbone. Qwen models are ungated and don't
+# require HuggingFace Hub access permissions.
+#
+# Kennedy (2025) tested both Qwen2.5-0.5B and Qwen2.5-1.5B and found the 1.5B
+# version showed clearer evidence of generative-syntax-like representations
+# (notably it was one of only two models in her set where the subj-infinitive
+# pair showed the SC > SR effect). Using the same model here lets us compare
+# results directly against her published numbers.
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: Qwen/Qwen2.5-1.5B
+  torch_dtype: bfloat16
+  batch_size: 192
+  max_length: 256
+  subword_pooling: mean  # H&M (2019) footnote 4 recommends averaging subwords.
+
+experiment:
+  kind: probe_training
+  name: qwen25_1_5b_ud_ewt
+  corpus_path: data/ud_ewt/ud_ewt_master.jsonl
+  activation_cache_name: ud_ewt
+  layers: null  # null = all layers (embedding + each transformer block)
+
+  probe:
+    rank: 64
+    learning_rate: 1.0e-3
+    epochs: 100
+    batch_size: 256
+    # Standardize per-corpus to mitigate outlier-feature magnitude blowup that
+    # otherwise causes layer 2-26 probes to diverge in modern decoder-only LLMs.
+    # See docs/design_decisions.md for the activation-norm diagnostic that
+    # motivated this default.
+    input_normalization: per_corpus_standardize
+    # H&M LR-reset-on-plateau schedule: when dev loss plateaus, reset Adam
+    # (no momentum kept) and divide LR by 10. Stop after 4 resets.
+    lr_decay_factor: 0.1
+    lr_decay_patience: 1
+    lr_decay_max_resets: 4

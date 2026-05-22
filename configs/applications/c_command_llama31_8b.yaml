@@ -1,0 +1,26 @@
+# Apply trained probes to c-command stimuli using meta-llama/Llama-3.1-8B.
+# Auto-resolves to the latest probe-training run named "llama31_8b_ud_ewt".
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: meta-llama/Llama-3.1-8B
+  torch_dtype: bfloat16
+  batch_size: 512
+  max_length: 80  # c-command stimuli (esp. RC modifier) are slightly longer than wh
+  subword_pooling: mean  # must match the trained probe bank's pooling
+
+experiment:
+  kind: apply_probes
+  name: c_command_llama31_8b
+  probe_run_name: llama31_8b_ud_ewt
+  stimuli_kind: c_command
+  stimuli_config:
+    kind: c_command_stimuli
+    name: default
+    num_items: 1000  # 20 stimuli per item across the three sub-experiments
+  activation_cache_name: c_command_stimuli

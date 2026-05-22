@@ -1,0 +1,34 @@
+# Train Hewitt & Manning structural probes per layer on UD English EWT,
+# using Llama-3.2-1B as the backbone. The probe is trained on dependency-tree
+# distances from gold UD parses; the experimental stimuli are NEVER part of
+# this corpus.
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: meta-llama/Llama-3.2-1B
+  torch_dtype: bfloat16
+  batch_size: 256
+  max_length: 256
+  subword_pooling: mean
+
+experiment:
+  kind: probe_training
+  name: llama32_1b_ud_ewt
+  corpus_path: data/ud_ewt/ud_ewt_master.jsonl
+  activation_cache_name: ud_ewt
+  layers: null  # null = all layers (embedding + each transformer block)
+
+  probe:
+    rank: 64
+    learning_rate: 1.0e-3
+    epochs: 100
+    batch_size: 256
+    input_normalization: per_corpus_standardize
+    lr_decay_factor: 0.1
+    lr_decay_patience: 1
+    lr_decay_max_resets: 4

@@ -1,0 +1,36 @@
+# Python build / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# uv / virtualenv
+.venv/
+.env
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Project artifacts (should be regenerated, not committed)
+data/cache/
+data/ud_ewt/
+results/
+
+# But do commit small fixture / example artifacts under specific names.
+!data/.gitkeep
+!results/.gitkeep
+
+# Notebook outputs
+*.ipynb_checkpoints
+
+# OS
+.DS_Store

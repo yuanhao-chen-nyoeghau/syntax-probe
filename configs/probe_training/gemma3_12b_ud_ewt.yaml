@@ -1,0 +1,37 @@
+# Train Hewitt & Manning structural probes per layer on UD English EWT,
+# using Gemma-3-12B as the backbone. Gemma license. Architecturally distinct: 5:1 interleaved local sliding-window (1024-token span) + global attention layers, vs. the full-attention-everywhere setup of Llama / Qwen / Mistral. -pt = pre-trained base (NOT instruction-tuned).
+#
+# See the model card on Hugging Face for layer count / hidden size:
+#   https://huggingface.co/google/gemma-3-12b-pt
+# Adjust batch_size if you have more or less VRAM headroom than the
+# template assumes.
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: google/gemma-3-12b-pt
+  torch_dtype: bfloat16
+  batch_size: 96
+  max_length: 256
+  subword_pooling: mean
+
+experiment:
+  kind: probe_training
+  name: gemma3_12b_ud_ewt
+  corpus_path: data/ud_ewt/ud_ewt_master.jsonl
+  activation_cache_name: ud_ewt
+  layers: null
+
+  probe:
+    rank: 64
+    learning_rate: 1.0e-3
+    epochs: 100
+    batch_size: 256
+    input_normalization: per_corpus_standardize
+    lr_decay_factor: 0.1
+    lr_decay_patience: 1
+    lr_decay_max_resets: 4

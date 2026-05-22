@@ -1,0 +1,26 @@
+# Apply trained probes to c-command stimuli using Qwen-3-4B.
+# Auto-resolves to the latest probe-training run named "qwen3_4b_ud_ewt".
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: Qwen/Qwen3-4B
+  torch_dtype: bfloat16
+  batch_size: 512
+  max_length: 80
+  subword_pooling: mean
+
+experiment:
+  kind: apply_probes
+  name: c_command_qwen3_4b
+  probe_run_name: qwen3_4b_ud_ewt
+  stimuli_kind: c_command
+  stimuli_config:
+    kind: c_command_stimuli
+    name: default
+    num_items: 1000
+  activation_cache_name: c_command_stimuli

@@ -1,0 +1,40 @@
+# Train Hewitt & Manning structural probes per layer on UD English EWT,
+# using Llama-3.1-8B as the backbone. Different decoder family than Qwen,
+# similar parameter count to Qwen2.5-7B; lets us separate "scale effects"
+# from "architecture-family effects".
+#
+# Sizing: 32 transformer layers, hidden_size 4096. Probe rank stays at 64.
+#
+# Note: Llama-3.1-8B is gated on HuggingFace Hub. Make sure you've
+# accepted the license at https://huggingface.co/meta-llama/Llama-3.1-8B
+# and run `huggingface-cli login` before launching this job.
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: meta-llama/Llama-3.1-8B
+  torch_dtype: bfloat16
+  batch_size: 128
+  max_length: 256
+  subword_pooling: mean
+
+experiment:
+  kind: probe_training
+  name: llama31_8b_ud_ewt
+  corpus_path: data/ud_ewt/ud_ewt_master.jsonl
+  activation_cache_name: ud_ewt
+  layers: null
+
+  probe:
+    rank: 64
+    learning_rate: 1.0e-3
+    epochs: 100
+    batch_size: 256
+    input_normalization: per_corpus_standardize
+    lr_decay_factor: 0.1
+    lr_decay_patience: 1
+    lr_decay_max_resets: 4

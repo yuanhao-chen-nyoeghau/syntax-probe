@@ -1,0 +1,17 @@
+# Generate c-command (reflexive binding) stimuli and write them to disk.
+# Mostly useful for inspecting and committing a stimulus set; the apply-probes
+# runner can also generate stimuli on the fly.
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: meta-llama/Llama-3.2-1B  # unused, but schema requires it
+
+experiment:
+  kind: c_command_stimuli
+  name: c_command_default_lexicon
+  num_items: 1000  # combinatorial pool has ~12K items; 1000 = 4,000 stimuli

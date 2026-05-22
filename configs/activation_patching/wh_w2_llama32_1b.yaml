@@ -1,0 +1,43 @@
+# W2 — phase-edge specificity, Llama-3.2-1B.
+#
+# Patches at L3 (the model's β-peak observational layer for the
+# wh-esubj finite-bare contrast; see docs/activation_patching_plan.md §3.1
+# for the full per-model table). Filtered to lexical-DP-embedded-subject
+# items (~430/1000) for the lexically-clean primary analysis. Both the
+# (finite, bare) and (infinitival, bare) source-target pairs.
+#
+# Auto-resolves to the latest probe-training run named "llama32_1b_ud_ewt".
+
+runtime:
+  seed: 13
+  output_dir: results
+  cache_dir: data/cache
+  log_level: INFO
+
+model:
+  model_name: meta-llama/Llama-3.2-1B
+  torch_dtype: bfloat16
+  batch_size: 256
+  max_length: 64
+  subword_pooling: mean
+
+experiment:
+  kind: activation_patching
+  name: wh_w2_llama32_1b
+  probe_run_name: llama32_1b_ud_ewt
+  stimuli_kind: wh_extraction
+  stimuli_config:
+    kind: wh_extraction_stimuli
+    name: default
+    num_items: 1000
+  variant_config:
+    variant: w2
+    intervention_layer: 3
+    intervention_roles:
+      - wh
+      - embedded_subject
+      - embedded_verb
+    source_target_pairs:
+      - [finite, bare]
+      - [infinitival, bare]
+    filter_to_lexical_dp: true
