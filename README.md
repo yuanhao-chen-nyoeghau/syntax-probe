@@ -2,6 +2,30 @@
 
 Probing large language models for formal syntactic structure.
 
+Authors:
+- Yuanhao Chen
+- Peter Chin
+
+Paper: 
+- *Probing Minimalist Phase Structure in LLMs: What Universal Dependencies Cannot Represent*
+- <https://arxiv.org/abs/2605.26431>
+
+```bibtex
+@misc{chenProbingMinimalistPhase2026,
+  title = {Probing {{Minimalist Phase Structure}} in {{LLMs}}: {{What Universal Dependencies Cannot Represent}}},
+  shorttitle = {Probing {{Minimalist Phase Structure}} in {{LLMs}}},
+  author = {Chen, Yuanhao and Chin, Peter},
+  year = 2026,
+  month = may,
+  number = {arXiv:2605.26431},
+  eprint = {2605.26431},
+  primaryclass = {cs.CL},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2605.26431},
+  archiveprefix = {arXiv},
+}
+```
+
 ## What this codebase does
 
 This codebase implements a pipeline for testing whether LLM hidden states encode formal syntactic structure beyond what dependency parses capture. The methodology, generalized from Kennedy (2025), is:
@@ -29,9 +53,6 @@ uv run syntax-probe download-corpus --output data/ud_ewt
 uv run python -m spacy download en_core_web_trf
 
 # Run the parser-distance verification check (Task 0.5).
-# Pass --set experiment.gpu_id=0 (or whichever device) to use the GPU; omit
-# for CPU. Verification on 20K c-command stimuli runs in ~1-3 min on GPU vs.
-# ~30+ min on CPU.
 uv run syntax-probe run configs/verify_stimuli/wh_extraction_spacy.yaml --set experiment.gpu_id=0
 uv run syntax-probe run configs/verify_stimuli/c_command_spacy.yaml     --set experiment.gpu_id=0
 
